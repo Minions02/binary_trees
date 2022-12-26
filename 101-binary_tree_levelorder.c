@@ -1,92 +1,62 @@
 #include "binary_trees.h"
 
 /**
- * visitCurrentLevel - calls ths func on each node on a level
- * @root: pointer to the node in the level to call the function in it's nodes
- * @level: level targeted
- * @func: pointer to the function to call on each node
- * Return: void
+ * binary_tree_height - measures the height of a binary tree
+ * @tree: the input root address
+ * Return: height of the binary tree
  */
-void visitCurrentLevel(binary_tree_t *root, int level, void (*func)(int))
+size_t binary_tree_height(const binary_tree_t *tree)
 {
-	if (root == NULL)
+	size_t rs, ls;
+
+	if (tree == NULL || (tree->left == NULL && tree->right == NULL))
+		return (0);
+	ls = binary_tree_height(tree->left);
+	rs = binary_tree_height(tree->right);
+	if (ls < rs)
+		return (rs + 1);
+	return (ls + 1);
+}
+
+/**
+ * printer - prints out the level where you are at.
+ * @tree: the input root address
+ * @func: input func address
+ * @level: height of node to be printed
+ */
+void printer(const binary_tree_t *tree, void (*func)(int), size_t level)
+{
+	if (tree == NULL)
 		return;
+
 	if (level == 1)
-		func(root->n);
+		func(tree->n);
+
 	else if (level > 1)
 	{
-		visitCurrentLevel(root->left, level - 1, func);
-		visitCurrentLevel(root->right, level - 1, func);
+		printer(tree->left, func, level - 1);
+		printer(tree->right, func, level - 1);
 	}
 }
 
-/**
- * visitLevelOrder - travers tree using level order traversal
- * @root: root node in the level to travers
- * @func: function to call on each node
- * Return: Void
- */
-
-void visitLevelOrder(binary_tree_t *root, void (*func)(int))
-{
-	int h = binary_tree_height(root) + 1;
-	int i;
-
-	for (i = 1; i <= h; i++)
-		visitCurrentLevel(root, i, func);
-}
 
 /**
- * binary_tree_levelorder - goes through a binary tree
- * using level-order traversal
- * @tree: pointer to the root node of the tree
- * @func: pointer to a function to call for each node
- * Return: void
+ * binary_tree_levelorder - traverse a binary tree using level-order traversal
+ * @tree: the input root address
+ * @func: input func address
  */
-
 void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
 {
+	size_t height, i = 1;
+
 	if (tree == NULL || func == NULL)
 		return;
-	visitLevelOrder((binary_tree_t *)tree, func);
-}
 
-/**
- * binary_tree_height - measures the height of a binary tree
- * @tree: pointer to the root node of the tree
- * Return: the size or 0 if tree is null
- */
+	height = binary_tree_height(tree) + 1;
 
-size_t binary_tree_height(const binary_tree_t *tree)
-{
-	int counter;
-
-	if (tree == NULL)
-		return (0);
-
-	counter = tree_height(tree);
-
-	return ((size_t)counter);
-}
-
-/**
- * tree_height - count node tree height
- * @node: node to measure
- * Return: height
- */
-
-int tree_height(const binary_tree_t *node)
-{
-	int lDepth, rDepth;
-
-	if (node == NULL)
-		return (-1);
-
-	lDepth = tree_height(node->left);
-	rDepth = tree_height(node->right);
-
-	if (lDepth > rDepth)
-		return (lDepth + 1);
-	else
-		return (rDepth + 1);
+	while (i <= height)
+	{
+		printer(tree, func, i);
+		i++;
+	}
 }
